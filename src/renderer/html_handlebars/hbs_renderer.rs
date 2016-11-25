@@ -75,6 +75,7 @@ impl Renderer for HtmlHandlebars {
                         // Parse for playpen links
                         if let Some(p) = path.parent() {
                             content = helpers::playpen::render_playpen(&content, p);
+                            content = helpers::mermaid::render_mermaid(&content, p);
                         }
 
                         // Render markdown using the pulldown-cmark crate
