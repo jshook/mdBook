@@ -1,31 +1,31 @@
 use std::path::{Path, PathBuf};
 use std::fs::File;
 use std::io::Read;
+use htmlescape::*;
 
-
-pub fn render_mermaid(s: &str, path: &Path) -> String {
+pub fn render_nomnoml(s: &str, path: &Path) -> String {
     // When replacing one thing in a string by something with a different length, the indices
     // after that will not correspond, we therefore have to store the difference to correct this
     let mut previous_end_index = 0;
     let mut replaced = String::new();
 
-    for mermaid in find_mermaids(s, path) {
+    for nomnoml in find_nomnomls(s, path) {
 
-        if mermaid.escaped {
-            replaced.push_str(&s[previous_end_index..mermaid.start_index - 1]);
-            replaced.push_str(&s[mermaid.start_index..mermaid.end_index]);
-            previous_end_index = mermaid.end_index;
+        if nomnoml.escaped {
+            replaced.push_str(&s[previous_end_index..nomnoml.start_index - 1]);
+            replaced.push_str(&s[nomnoml.start_index..nomnoml.end_index]);
+            previous_end_index = nomnoml.end_index;
             continue;
         }
 
         // Check if the file exists
-        if !mermaid.rust_file.exists() || !mermaid.rust_file.is_file() {
-            warn!("[-] No file exists for {{{{#mermaid }}}}\n    {}", mermaid.rust_file.to_str().unwrap());
+        if !nomnoml.rust_file.exists() || !nomnoml.rust_file.is_file() {
+            warn!("[-] No file exists for {{{{#nomnoml }}}}\n    {}", nomnoml.rust_file.to_str().unwrap());
             continue;
         }
 
         // Open file & read file
-        let mut file = if let Ok(f) = File::open(&mermaid.rust_file) {
+        let mut file = if let Ok(f) = File::open(&nomnoml.rust_file) {
             f
         } else {
             continue;
@@ -35,13 +35,13 @@ pub fn render_mermaid(s: &str, path: &Path) -> String {
             continue;
         };
 
-        let replacement = String::new() + "<div class=\"mermaid\">\n" + &file_content + "\n</div>";
-
-        replaced.push_str(&s[previous_end_index..mermaid.start_index]);
+        let replacement = String::new() + "<div class=\"nndata\" id=\"nomnoml-text1\">\n" + &encode_minimal(&file_content) + "\n</div>\n"
+        + "<div class=\"nnview\" id=\"nomnoml-view1\"></div>\n";
+        replaced.push_str(&s[previous_end_index..nomnoml.start_index]);
         replaced.push_str(&replacement);
-        previous_end_index = mermaid.end_index;
-        // println!("Mermaid{{ {}, {}, {:?}, {} }}", mermaid.start_index, mermaid.end_index, mermaid.rust_file,
-        // mermaid.editable);
+        previous_end_index = nomnoml.end_index;
+        // println!("Nomnoml{{ {}, {}, {:?}, {} }}", nomnoml.start_index, nomnoml.end_index, nomnoml.rust_file,
+        // nomnoml.editable);
     }
 
     replaced.push_str(&s[previous_end_index..]);
@@ -50,7 +50,7 @@ pub fn render_mermaid(s: &str, path: &Path) -> String {
 }
 
 #[derive(PartialOrd, PartialEq, Debug)]
-struct Mermaid {
+struct Nomnoml {
     start_index: usize,
     end_index: usize,
     rust_file: PathBuf,
@@ -58,10 +58,10 @@ struct Mermaid {
     escaped: bool,
 }
 
-fn find_mermaids(s: &str, base_path: &Path) -> Vec<Mermaid> {
-    let mut mermaids = vec![];
-    for (i, _) in s.match_indices("{{#mermaid") {
-        debug!("[*]: find_mermaid");
+fn find_nomnomls(s: &str, base_path: &Path) -> Vec<Nomnoml> {
+    let mut nomnomls = vec![];
+    for (i, _) in s.match_indices("{{#nomnoml") {
+        debug!("[*]: find_nomnoml");
 
         let mut escaped = false;
 
@@ -81,7 +81,7 @@ fn find_mermaids(s: &str, base_path: &Path) -> Vec<Mermaid> {
 
         debug!("s[{}..{}] = {}", i, end_i, s[i..end_i].to_string());
 
-        // If there is nothing between "{{#mermaid" and "}}" skip
+        // If there is nothing between "{{#nomnoml" and "}}" skip
         if end_i - 2 - (i + 10) < 1 {
             continue;
         }
@@ -103,7 +103,7 @@ fn find_mermaids(s: &str, base_path: &Path) -> Vec<Mermaid> {
             };
         }
 
-        mermaids.push(Mermaid {
+        nomnomls.push(Nomnoml {
             start_index: i,
             end_index: end_i,
             rust_file: base_path.join(PathBuf::from(params[0])),
@@ -112,7 +112,7 @@ fn find_mermaids(s: &str, base_path: &Path) -> Vec<Mermaid> {
         })
     }
 
-    mermaids
+    nomnomls
 }
 
 
@@ -123,38 +123,38 @@ fn find_mermaids(s: &str, base_path: &Path) -> Vec<Mermaid> {
 //
 
 #[test]
-fn test_find_mermaids_no_mermaid() {
-    let s = "Some random text without mermaid...";
-    assert!(find_mermaids(s, Path::new("")) == vec![]);
+fn test_find_nomnomls_no_nomnoml() {
+    let s = "Some random text without nomnoml...";
+    assert!(find_nomnomls(s, Path::new("")) == vec![]);
 }
 
 #[test]
-fn test_find_mermaids_partial_mermaid() {
-    let s = "Some random text with {{#mermaid...";
-    assert!(find_mermaids(s, Path::new("")) == vec![]);
+fn test_find_nomnomls_partial_nomnoml() {
+    let s = "Some random text with {{#nomnoml...";
+    assert!(find_nomnomls(s, Path::new("")) == vec![]);
 }
 
 #[test]
-fn test_find_mermaids_empty_mermaid() {
-    let s = "Some random text with {{#mermaid}} and {{#mermaid   }}...";
-    assert!(find_mermaids(s, Path::new("")) == vec![]);
+fn test_find_nomnomls_empty_nomnoml() {
+    let s = "Some random text with {{#nomnoml}} and {{#nomnoml   }}...";
+    assert!(find_nomnomls(s, Path::new("")) == vec![]);
 }
 
 #[test]
-fn test_find_mermaids_simple_mermaid() {
-    let s = "Some random text with {{#mermaid file.rs}} and {{#mermaid test.rs }}...";
+fn test_find_nomnomls_simple_nomnoml() {
+    let s = "Some random text with {{#nomnoml file.rs}} and {{#nomnoml test.rs }}...";
 
-    println!("\nOUTPUT: {:?}\n", find_mermaids(s, Path::new("")));
+    println!("\nOUTPUT: {:?}\n", find_nomnomls(s, Path::new("")));
 
-    assert!(find_mermaids(s, Path::new("")) ==
-            vec![Mermaid {
+    assert!(find_nomnomls(s, Path::new("")) ==
+            vec![Nomnoml {
                      start_index: 22,
                      end_index: 42,
                      rust_file: PathBuf::from("file.rs"),
                      editable: false,
                      escaped: false,
                  },
-                 Mermaid {
+                 Nomnoml {
                      start_index: 47,
                      end_index: 68,
                      rust_file: PathBuf::from("test.rs"),
@@ -164,20 +164,20 @@ fn test_find_mermaids_simple_mermaid() {
 }
 
 #[test]
-fn test_find_mermaids_complex_mermaid() {
-    let s = "Some random text with {{#mermaid file.rs editable}} and {{#mermaid test.rs editable }}...";
+fn test_find_nomnomls_complex_nomnoml() {
+    let s = "Some random text with {{#nomnoml file.rs editable}} and {{#nomnoml test.rs editable }}...";
 
-    println!("\nOUTPUT: {:?}\n", find_mermaids(s, Path::new("dir")));
+    println!("\nOUTPUT: {:?}\n", find_nomnomls(s, Path::new("dir")));
 
-    assert!(find_mermaids(s, Path::new("dir")) ==
-            vec![Mermaid {
+    assert!(find_nomnomls(s, Path::new("dir")) ==
+            vec![Nomnoml {
                      start_index: 22,
                      end_index: 51,
                      rust_file: PathBuf::from("dir/file.rs"),
                      editable: true,
                      escaped: false,
                  },
-                 Mermaid {
+                 Nomnoml {
                      start_index: 56,
                      end_index: 86,
                      rust_file: PathBuf::from("dir/test.rs"),
@@ -187,13 +187,13 @@ fn test_find_mermaids_complex_mermaid() {
 }
 
 #[test]
-fn test_find_mermaids_escaped_mermaid() {
-    let s = "Some random text with escaped mermaid \\{{#mermaid file.rs editable}} ...";
+fn test_find_nomnomls_escaped_nomnoml() {
+    let s = "Some random text with escaped nomnoml \\{{#nomnoml file.rs editable}} ...";
 
-    println!("\nOUTPUT: {:?}\n", find_mermaids(s, Path::new("")));
+    println!("\nOUTPUT: {:?}\n", find_nomnomls(s, Path::new("")));
 
-    assert!(find_mermaids(s, Path::new("")) ==
+    assert!(find_nomnomls(s, Path::new("")) ==
             vec![
-        Mermaid{start_index: 39, end_index: 68, rust_file: PathBuf::from("file.rs"), editable: true, escaped: true},
+        Nomnoml{start_index: 39, end_index: 68, rust_file: PathBuf::from("file.rs"), editable: true, escaped: true},
     ]);
 }

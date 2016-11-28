@@ -29,6 +29,19 @@
         <!-- MathJax -->
         <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
+        <!-- nomnoml -->
+        <script src="nomnoml/zepto.min.js"></script>
+        <script src="nomnoml/lodash.min.js"></script>
+        <script src="nomnoml/dagre.min.js"></script>
+        <script src="nomnoml/skanaar.util.js"></script>
+        <script src="nomnoml/skanaar.svg.js"></script>
+        <script src="nomnoml/skanaar.vector.js"></script>
+        <script src="nomnoml/nomnoml.jison.js"></script>
+        <script src="nomnoml/nomnoml.parser.js"></script>
+        <script src="nomnoml/nomnoml.layouter.js"></script>
+        <script src="nomnoml/nomnoml.renderer.js"></script>
+        <script src="nomnoml/nomnoml.js"></script>
+
         <!-- Fetch JQuery from CDN but have a local fallback -->
         <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
         <script>
@@ -111,6 +124,12 @@
             if ($(".fa").css("font-family") !== "FontAwesome") {
                 $('<link rel="stylesheet" type="text/css" href="_FontAwesome/css/font-awesome.css">').prependTo('head');
             }
+        </script>
+
+        <script>
+            var target = document.getElementById('nomnoml-view1');
+            var noml = document.getElementById('nomnoml-text1');
+            target.innerHTML = nomnoml.renderSvg(noml);
         </script>
 
         <!-- Livereload script (if served using the cli tool) -->

@@ -22,6 +22,7 @@ serde_json = "0.8.3"
 pulldown-cmark = "0.0.8"
 log = "0.3"
 env_logger = "0.3.4"
+htmlescape = { git = "https://github.com/veddan/rust-htmlescape" }
 
 # Watch feature
 notify = { version = "2.5.5", optional = true }
