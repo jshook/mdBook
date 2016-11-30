@@ -23,6 +23,7 @@ pulldown-cmark = "0.0.8"
 log = "0.3"
 env_logger = "0.3.4"
 htmlescape = { git = "https://github.com/veddan/rust-htmlescape" }
+zip = "0.2.0"
 
 # Watch feature
 notify = { version = "2.5.5", optional = true }

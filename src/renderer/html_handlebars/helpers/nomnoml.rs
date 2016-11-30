@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 use std::fs::File;
 use std::io::Read;
-use htmlescape::*;
+//use htmlescape::*;
 
 pub fn render_nomnoml(s: &str, path: &Path) -> String {
     // When replacing one thing in a string by something with a different length, the indices
@@ -19,13 +19,13 @@ pub fn render_nomnoml(s: &str, path: &Path) -> String {
         }
 
         // Check if the file exists
-        if !nomnoml.rust_file.exists() || !nomnoml.rust_file.is_file() {
-            warn!("[-] No file exists for {{{{#nomnoml }}}}\n    {}", nomnoml.rust_file.to_str().unwrap());
+        if !nomnoml.nomnoml_file.exists() || !nomnoml.nomnoml_file.is_file() {
+            warn!("[-] No file exists for {{{{#nomnoml }}}}\n    {}", nomnoml.nomnoml_file.to_str().unwrap());
             continue;
         }
 
         // Open file & read file
-        let mut file = if let Ok(f) = File::open(&nomnoml.rust_file) {
+        let mut file = if let Ok(f) = File::open(&nomnoml.nomnoml_file) {
             f
         } else {
             continue;
@@ -35,12 +35,12 @@ pub fn render_nomnoml(s: &str, path: &Path) -> String {
             continue;
         };
 
-        let replacement = String::new() + "<div class=\"nndata\" id=\"nomnoml-text1\">\n" + &encode_minimal(&file_content) + "\n</div>\n"
-        + "<div class=\"nnview\" id=\"nomnoml-view1\"></div>\n";
+        let replacement = String::new() + "<script id=\"nomnoml-text1\" type=\"text/plain\">\n" + &file_content + "\n</script>\n"
+        + "<div id=\"nomnoml-view1\"></div>\n";
         replaced.push_str(&s[previous_end_index..nomnoml.start_index]);
         replaced.push_str(&replacement);
         previous_end_index = nomnoml.end_index;
-        // println!("Nomnoml{{ {}, {}, {:?}, {} }}", nomnoml.start_index, nomnoml.end_index, nomnoml.rust_file,
+        // println!("Nomnoml{{ {}, {}, {:?}, {} }}", nomnoml.start_index, nomnoml.end_index, nomnoml.nomnoml_file,
         // nomnoml.editable);
     }
 
@@ -53,7 +53,7 @@ pub fn render_nomnoml(s: &str, path: &Path) -> String {
 struct Nomnoml {
     start_index: usize,
     end_index: usize,
-    rust_file: PathBuf,
+    nomnoml_file: PathBuf,
     editable: bool,
     escaped: bool,
 }
@@ -106,7 +106,7 @@ fn find_nomnomls(s: &str, base_path: &Path) -> Vec<Nomnoml> {
         nomnomls.push(Nomnoml {
             start_index: i,
             end_index: end_i,
-            rust_file: base_path.join(PathBuf::from(params[0])),
+            nomnoml_file: base_path.join(PathBuf::from(params[0])),
             editable: editable,
             escaped: escaped,
         })
@@ -150,14 +150,14 @@ fn test_find_nomnomls_simple_nomnoml() {
             vec![Nomnoml {
                      start_index: 22,
                      end_index: 42,
-                     rust_file: PathBuf::from("file.rs"),
+                     nomnoml_file: PathBuf::from("file.rs"),
                      editable: false,
                      escaped: false,
                  },
                  Nomnoml {
                      start_index: 47,
                      end_index: 68,
-                     rust_file: PathBuf::from("test.rs"),
+                     nomnoml_file: PathBuf::from("test.rs"),
                      editable: false,
                      escaped: false,
                  }]);
@@ -173,14 +173,14 @@ fn test_find_nomnomls_complex_nomnoml() {
             vec![Nomnoml {
                      start_index: 22,
                      end_index: 51,
-                     rust_file: PathBuf::from("dir/file.rs"),
+                     nomnoml_file: PathBuf::from("dir/file.rs"),
                      editable: true,
                      escaped: false,
                  },
                  Nomnoml {
                      start_index: 56,
                      end_index: 86,
-                     rust_file: PathBuf::from("dir/test.rs"),
+                     nomnoml_file: PathBuf::from("dir/test.rs"),
                      editable: true,
                      escaped: false,
                  }]);
@@ -194,6 +194,6 @@ fn test_find_nomnomls_escaped_nomnoml() {
 
     assert!(find_nomnomls(s, Path::new("")) ==
             vec![
-        Nomnoml{start_index: 39, end_index: 68, rust_file: PathBuf::from("file.rs"), editable: true, escaped: true},
+        Nomnoml{start_index: 39, end_index: 68, nomnoml_file: PathBuf::from("file.rs"), editable: true, escaped: true},
     ]);
 }

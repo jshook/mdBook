@@ -128,8 +128,32 @@
 
         <script>
             var target = document.getElementById('nomnoml-view1');
-            var noml = document.getElementById('nomnoml-text1');
-            target.innerHTML = nomnoml.renderSvg(noml);
+            var noml = document.getElementById('nomnoml-text1').innerHTML;
+
+            function createElement(str) {
+                var div = document.createElement('div');
+                div.innerHTML = str;
+                var container = document.createDocumentFragment();
+                for (var i=0; i < div.childNodes.length; i++) {
+                    var node = div.childNodes[i].cloneNode(true);
+                    container.appendChild(node);
+                }
+                return container.childNodes[0];
+            }
+
+            var node = createElement(nomnoml.renderSvg(noml));
+            node.setAttribute('viewbox',"0 0 500 500");
+            node.setAttribute('preserveAspectRatio',"xMidYMin slice");
+            node.setAttribute('style',"width: 100%; padding-bottom: 80%; height: 1px; overflow: visible; font-weight:bold; font-size:12pt; font-family:'Calibri', Helvetica, sans-serif;;stroke-width:3;stroke-linejoin:round;stroke-linecap:round");
+//            node.insertAdjacentHTML('beforestart',"");
+            target.replaceWith(node);
+
+//            target.appendChild(node);
+
+//
+//            target.insertAdjacentHTML('beforebegin',nomnoml.renderSvg(noml));
+//            target.innerHTML = nomnoml.renderSvg(noml);
+//            target.setAttribute('style','')
         </script>
 
         <!-- Livereload script (if served using the cli tool) -->

@@ -4,6 +4,8 @@ use book::MDBook;
 use book::bookitem::BookItem;
 use {utils, theme};
 
+extern crate zip;
+
 use std::path::{Path, PathBuf};
 use std::fs::{self, File};
 use std::error::Error;
@@ -276,8 +278,49 @@ impl Renderer for HtmlHandlebars {
         // Copy all remaining files
         try!(utils::fs::copy_files_except_ext(book.get_src(), book.get_dest(), true, &["md"]));
 
+        write_nomnoml(book)?;
+
         Ok(())
     }
+}
+
+fn write_nomnoml(book: &MDBook) -> Result<(), Box<Error>> {
+    let buf: &[u8] = include_bytes!("nomnoml.zip");
+    //&[0u8; 128];
+
+    use std::io::Cursor;
+    let reader = Cursor::new(buf);
+    let mut zip = zip::read::ZipArchive::new(reader)?;
+
+    for i in 0..zip.len() {
+        let mut zipfile = &mut zip.by_index(i).unwrap();
+
+        {
+            let zippath = Path::new(zipfile.name());
+            if zippath.exists() {
+                continue;
+            }
+        }
+
+        {
+            let zippath = book.get_dest().join(zipfile.name());
+            let parent = zippath.parent().unwrap();
+//            let parent = book.get_dest().join(Path::new(zipfile.name())).parent().unwrap();
+            if !parent.exists() {
+                println!("creating directory: {}", parent.display());
+                fs::create_dir_all(parent)?;
+            }
+        }
+
+        {
+            let filepath=book.get_dest().join(Path::new(zipfile.name()));
+            println!(" creating {}", filepath.display());
+            let mut file_buffer = File::create(filepath)?;
+            io::copy(&mut zipfile, &mut file_buffer)?;
+        }
+    }
+
+    Ok(())
 }
 
 fn make_data(book: &MDBook) -> Result<serde_json::Map<String, serde_json::Value>, Box<Error>> {
