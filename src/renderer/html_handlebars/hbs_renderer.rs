@@ -293,7 +293,7 @@ fn write_nomnoml(book: &MDBook) -> Result<(), Box<Error>> {
     let mut zip = zip::read::ZipArchive::new(reader)?;
 
     for i in 0..zip.len() {
-        let mut zipfile = &mut zip.by_index(i).unwrap();
+        let mut zipfile = &mut zip.by_index(i)?;
 
         let zippath = Path::new(zipfile.name()).to_path_buf();
         if zippath.exists() {
