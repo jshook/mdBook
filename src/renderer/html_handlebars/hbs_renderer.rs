@@ -294,21 +294,10 @@ fn write_nomnoml(book: &MDBook) -> Result<(), Box<Error>> {
 
     for i in 0..zip.len() {
         let mut zipfile = &mut zip.by_index(i)?;
-
-        let zippath = Path::new(zipfile.name()).to_path_buf();
-        if zippath.exists() {
-            continue;
-        }
-        let zippath = book.get_dest().join(zipfile.name());
-        let parent = zippath.parent().unwrap();
-        if !parent.exists() {
-            println!("creating directory: {}", parent.display());
-            fs::create_dir_all(parent)?;
-        }
-        let filepath=book.get_dest().join(Path::new(zipfile.name()));
-        println!(" creating {}", filepath.display());
-        let mut file_buffer = File::create(filepath)?;
-        io::copy(&mut zipfile, &mut file_buffer)?;
+        let zip_resource_path = Path::new(zipfile.name()).to_path_buf();
+        let target_book_path = book.get_dest().join(zip_resource_path);
+        fs::create_dir_all(target_book_path.as_path().parent().unwrap())?;
+        io::copy(&mut zipfile, &mut File::create(target_book_path)?)?;
     }
 
     Ok(())
