@@ -278,7 +278,10 @@ impl Renderer for HtmlHandlebars {
         // Copy all remaining files
         try!(utils::fs::copy_files_except_ext(book.get_src(), book.get_dest(), true, &["md"]));
 
+        write_fontawesome(book)?;
         write_nomnoml(book)?;
+        write_mermaid(book)?;
+        write_mathjax(book)?;
 
         Ok(())
     }
@@ -286,7 +289,22 @@ impl Renderer for HtmlHandlebars {
 
 fn write_nomnoml(book: &MDBook) -> Result<(), Box<Error>> {
     let buf: &[u8] = include_bytes!("nomnoml.zip");
-    //&[0u8; 128];
+    write_zip(buf, book)
+}
+fn write_fontawesome(book: &MDBook) -> Result<(), Box<Error>> {
+    let buf: &[u8] = include_bytes!("fontawesome.zip");
+    write_zip(buf, book)
+}
+fn write_mermaid(book: &MDBook) -> Result<(), Box<Error>> {
+    let buf: &[u8] = include_bytes!("mermaid.zip");
+    write_zip(buf, book)
+}
+fn write_mathjax(book: &MDBook) -> Result<(), Box<Error>> {
+    let buf: &[u8] = include_bytes!("mathjax.zip");
+    write_zip(buf, book)
+}
+
+fn write_zip(buf: &[u8], book: &MDBook) -> Result<(), Box<Error>> {
 
     use std::io::Cursor;
     let reader = Cursor::new(buf);

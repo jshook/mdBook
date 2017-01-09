@@ -15,19 +15,18 @@
         <link rel="shortcut icon" href="{{ favicon }}">
 
         <!-- Font Awesome -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="fontawesome/font-awesome.min.css">
 
         <link rel="stylesheet" href="highlight.css">
         <link rel="stylesheet" href="tomorrow-night.css">
 
         <!-- Mermaid -->
-        <link rel="stylesheet" href="https://cdn.rawgit.com/knsv/mermaid/6.0.0/dist/mermaid.css">
-
-        <script type="text/javascript" src="https://cdn.rawgit.com/knsv/mermaid/6.0.0/dist/mermaid.min.js"></script>
-        <script>mermaid.initialize({startOnLoad:true});</script>
+        <link rel="stylesheet" href="mermaid/mermaid.css">
+        <script type="text/javascript" src="mermaid/mermaid.min.js"></script>
+        <script>mermaid.initialize({startOnLoad:true,useMaxWidth:false});</script>
 
         <!-- MathJax -->
-        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="mathjax/mathjax-TeX-AMS-MML_HTMLorMML.js"></script>
 
         <!-- nomnoml -->
         <!--<script src="nomnoml/zepto.min.js"></script>-->
@@ -44,7 +43,7 @@
         <script src="nomnoml/nomnoml.js"></script>
 
         <!-- Fetch JQuery from CDN but have a local fallback -->
-        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <!--<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>-->
         <script>
             if (typeof jQuery == 'undefined') {
                 document.write(unescape("%3Cscript src='jquery.js'%3E%3C/script%3E"));
