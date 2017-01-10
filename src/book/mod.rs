@@ -29,6 +29,7 @@ pub struct MDBook {
     renderer: Box<Renderer>,
 
     livereload: Option<String>,
+    buildfull: bool,
 }
 
 impl MDBook {
@@ -39,7 +40,7 @@ impl MDBook {
     ///
     /// They can both be changed by using [`set_src()`](#method.set_src) and [`set_dest()`](#method.set_dest)
 
-    pub fn new(root: &Path) -> MDBook {
+    pub fn new(root: &Path, fullbuild: bool) -> MDBook {
 
         if !root.exists() || !root.is_dir() {
             warn!("{:?} No directory with that name", root);
@@ -58,6 +59,7 @@ impl MDBook {
             renderer: Box::new(HtmlHandlebars::new()),
 
             livereload: None,
+            buildfull: fullbuild,
         }
     }
 
@@ -217,7 +219,9 @@ impl MDBook {
         try!(self.init());
 
         // Clean output directory
-        try!(utils::fs::remove_dir_content(&self.dest));
+        if self.buildfull {
+            try!(utils::fs::remove_dir_content(&self.dest));
+        }
 
         try!(self.renderer.render(&self));
 
@@ -374,6 +378,10 @@ impl MDBook {
         }
 
         self
+    }
+
+    pub fn get_buildfull(&self) -> bool {
+        self.buildfull
     }
 
     pub fn get_dest(&self) -> &Path {

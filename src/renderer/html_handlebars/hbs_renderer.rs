@@ -224,57 +224,6 @@ impl Renderer for HtmlHandlebars {
         };
         try!(highlight_js.write_all(&theme.highlight_js));
 
-        // Font Awesome local fallback
-        let mut font_awesome = if let Ok(f) = utils::fs::create_file(&book.get_dest()
-            .join("_FontAwesome/css/font-awesome.css")) {
-            f
-        } else {
-            return Err(Box::new(io::Error::new(io::ErrorKind::Other, "Could not create font-awesome.css")));
-        };
-        try!(font_awesome.write_all(theme::FONT_AWESOME));
-        let mut font_awesome = if let Ok(f) = utils::fs::create_file(&book.get_dest()
-            .join("_FontAwesome/fonts/fontawesome-webfont.eot")) {
-            f
-        } else {
-            return Err(Box::new(io::Error::new(io::ErrorKind::Other, "Could not create fontawesome-webfont.eot")));
-        };
-        try!(font_awesome.write_all(theme::FONT_AWESOME_EOT));
-        let mut font_awesome = if let Ok(f) = utils::fs::create_file(&book.get_dest()
-            .join("_FontAwesome/fonts/fontawesome-webfont.svg")) {
-            f
-        } else {
-            return Err(Box::new(io::Error::new(io::ErrorKind::Other, "Could not create fontawesome-webfont.svg")));
-        };
-        try!(font_awesome.write_all(theme::FONT_AWESOME_SVG));
-        let mut font_awesome = if let Ok(f) = utils::fs::create_file(&book.get_dest()
-            .join("_FontAwesome/fonts/fontawesome-webfont.ttf")) {
-            f
-        } else {
-            return Err(Box::new(io::Error::new(io::ErrorKind::Other, "Could not create fontawesome-webfont.ttf")));
-        };
-        try!(font_awesome.write_all(theme::FONT_AWESOME_TTF));
-        let mut font_awesome = if let Ok(f) = utils::fs::create_file(&book.get_dest()
-            .join("_FontAwesome/fonts/fontawesome-webfont.woff")) {
-            f
-        } else {
-            return Err(Box::new(io::Error::new(io::ErrorKind::Other, "Could not create fontawesome-webfont.woff")));
-        };
-        try!(font_awesome.write_all(theme::FONT_AWESOME_WOFF));
-        let mut font_awesome = if let Ok(f) = utils::fs::create_file(&book.get_dest()
-            .join("_FontAwesome/fonts/fontawesome-webfont.woff2")) {
-            f
-        } else {
-            return Err(Box::new(io::Error::new(io::ErrorKind::Other, "Could not create fontawesome-webfont.woff2")));
-        };
-        try!(font_awesome.write_all(theme::FONT_AWESOME_WOFF2));
-        let mut font_awesome = if let Ok(f) = utils::fs::create_file(&book.get_dest()
-            .join("_FontAwesome/fonts/FontAwesome.ttf")) {
-            f
-        } else {
-            return Err(Box::new(io::Error::new(io::ErrorKind::Other, "Could not create FontAwesome.ttf")));
-        };
-        try!(font_awesome.write_all(theme::FONT_AWESOME_TTF));
-
         // Copy all remaining files
         try!(utils::fs::copy_files_except_ext(book.get_src(), book.get_dest(), true, &["md"]));
 
@@ -289,19 +238,40 @@ impl Renderer for HtmlHandlebars {
 
 fn write_nomnoml(book: &MDBook) -> Result<(), Box<Error>> {
     let buf: &[u8] = include_bytes!("nomnoml.zip");
-    write_zip(buf, book)
+    if book.get_buildfull() || !book.get_dest().join(Path::new("nomnoml")).exists() {
+        println!("Writing nomnoml static assets.");
+        write_zip(buf, book)
+    } else {
+        Ok(())
+    }
 }
 fn write_fontawesome(book: &MDBook) -> Result<(), Box<Error>> {
     let buf: &[u8] = include_bytes!("fontawesome.zip");
-    write_zip(buf, book)
+    if book.get_buildfull() || !book.get_dest().join(Path::new("fontawesome")).exists() {
+        println!("Writing fontawesome static assets.");
+        write_zip(buf, book)
+    } else {
+        Ok(())
+    }
 }
 fn write_mermaid(book: &MDBook) -> Result<(), Box<Error>> {
     let buf: &[u8] = include_bytes!("mermaid.zip");
-    write_zip(buf, book)
+
+    if book.get_buildfull() || !book.get_dest().join(Path::new("mermaid")).exists() {
+        println!("Writing mermaid static assets.");
+        write_zip(buf, book)
+    } else {
+        Ok(())
+    }
 }
 fn write_mathjax(book: &MDBook) -> Result<(), Box<Error>> {
     let buf: &[u8] = include_bytes!("mathjax.zip");
-    write_zip(buf, book)
+    if book.get_buildfull() || !book.get_dest().join(Path::new("mathjax")).exists() {
+        println!("Writing mathjax static assets.");
+        write_zip(buf, book)
+    } else {
+        Ok(())
+    }
 }
 
 fn write_zip(buf: &[u8], book: &MDBook) -> Result<(), Box<Error>> {
@@ -312,6 +282,9 @@ fn write_zip(buf: &[u8], book: &MDBook) -> Result<(), Box<Error>> {
 
     for i in 0..zip.len() {
         let mut zipfile = &mut zip.by_index(i)?;
+        if zipfile.name().ends_with("/") {
+            continue;
+        }
         let zip_resource_path = Path::new(zipfile.name()).to_path_buf();
         let target_book_path = book.get_dest().join(zip_resource_path);
         fs::create_dir_all(target_book_path.as_path().parent().unwrap())?;

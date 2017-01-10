@@ -109,7 +109,7 @@ fn confirm() -> bool {
 fn init(args: &ArgMatches) -> Result<(), Box<Error>> {
 
     let book_dir = get_book_dir(args);
-    let mut book = MDBook::new(&book_dir);
+    let mut book = MDBook::new(&book_dir, true);
 
     // Call the function that does the initialization
     try!(book.init());
@@ -159,7 +159,7 @@ fn init(args: &ArgMatches) -> Result<(), Box<Error>> {
 // Build command implementation
 fn build(args: &ArgMatches) -> Result<(), Box<Error>> {
     let book_dir = get_book_dir(args);
-    let mut book = MDBook::new(&book_dir).read_config();
+    let mut book = MDBook::new(&book_dir,true).read_config();
 
     try!(book.build());
 
@@ -171,7 +171,7 @@ fn build(args: &ArgMatches) -> Result<(), Box<Error>> {
 #[cfg(feature = "watch")]
 fn watch(args: &ArgMatches) -> Result<(), Box<Error>> {
     let book_dir = get_book_dir(args);
-    let mut book = MDBook::new(&book_dir).read_config();
+    let mut book = MDBook::new(&book_dir,false).read_config();
 
     trigger_on_change(&mut book, |event, book| {
         if let Some(path) = event.path {
@@ -194,7 +194,7 @@ fn serve(args: &ArgMatches) -> Result<(), Box<Error>> {
     const RELOAD_COMMAND: &'static str = "reload";
 
     let book_dir = get_book_dir(args);
-    let mut book = MDBook::new(&book_dir).read_config();
+    let mut book = MDBook::new(&book_dir,false).read_config();
     let port = args.value_of("port").unwrap_or("3000");
     let ws_port = args.value_of("ws-port").unwrap_or("3001");
     let interface = args.value_of("interface").unwrap_or("localhost");
@@ -256,7 +256,7 @@ fn serve(args: &ArgMatches) -> Result<(), Box<Error>> {
 
 fn test(args: &ArgMatches) -> Result<(), Box<Error>> {
     let book_dir = get_book_dir(args);
-    let mut book = MDBook::new(&book_dir).read_config();
+    let mut book = MDBook::new(&book_dir,true).read_config();
 
     try!(book.test());
 

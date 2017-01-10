@@ -5,7 +5,7 @@ lazy_static! {
     }
 
 pub fn render_mermaid(s: &str) -> String {
-    BLOCK_RE.replace_all(s, "\n<div class=\"mermaid\">\n$spec\n</div>\n")
+    BLOCK_RE.replace_all(s, "\n<div class=\"mermaid\" style=\"display:inline;\">\n$spec\n</div>\n")
 }
 
 // ---------------------------------------------------------------------------------

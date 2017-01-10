@@ -15,7 +15,7 @@
         <link rel="shortcut icon" href="{{ favicon }}">
 
         <!-- Font Awesome -->
-        <link rel="stylesheet" href="fontawesome/font-awesome.min.css">
+        <link rel="stylesheet" href="fontawesome/css/font-awesome.min.css">
 
         <link rel="stylesheet" href="highlight.css">
         <link rel="stylesheet" href="tomorrow-night.css">
@@ -26,7 +26,35 @@
         <script>mermaid.initialize({startOnLoad:true,useMaxWidth:false});</script>
 
         <!-- MathJax -->
-        <script type="text/javascript" src="mathjax/mathjax-TeX-AMS-MML_HTMLorMML.js"></script>
+        <script type="text/x-mathjax-config">
+          MathJax.Hub.Config({
+            extensions: ["tex2jax.js"],
+            jax: ["input/TeX", "output/HTML-CSS"],
+            tex2jax: {
+              inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+              displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+              processEscapes: false,
+              balanceBraces: true,
+              skipTags: ["script","noscript","style","textarea","pre","code","annotation","annotation-xml"],
+              ignoreClass: "tex2jax_ignore"
+            },
+            asciimath2jax: {
+             delimiters: [
+                   ['`','`']
+                 ],
+             skipTags: ["script","noscript","style","textarea","pre","code","annotation","annotation-xml"],
+             preview: "AsciiMath"
+            },
+            showProcessingMessages: true,
+            messageStyle: "normal",
+            displayAlign: "center",
+            displayIndent: "0",
+            showMathMenu: true,
+            "HTML-CSS": { availableFonts: ["TeX"] }
+          });
+        </script>
+        <script type="text/javascript" src="mathjax/MathJax.js"></script>
+
 
         <!-- nomnoml -->
         <!--<script src="nomnoml/zepto.min.js"></script>-->
