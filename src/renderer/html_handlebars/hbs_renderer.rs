@@ -79,7 +79,6 @@ impl Renderer for HtmlHandlebars {
                             content = helpers::playpen::render_playpen(&content, p);
                             content = helpers::mermaid::render_mermaid(&content);
                             content = helpers::nomnoml::render_nomnoml(&content);
-                            content = helpers::functionplot::render_functionplot(&content);
                             content = helpers::jsxgraph::render_jsxgraph(&content);
                         }
 
