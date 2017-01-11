@@ -232,7 +232,6 @@ impl Renderer for HtmlHandlebars {
         write_nomnoml(book)?;
         write_mermaid(book)?;
         write_mathjax(book)?;
-//        write_functionplot(book)?;
         write_jsxgraph(book)?;
 
         Ok(())
@@ -248,16 +247,6 @@ fn write_jsxgraph(book: &MDBook) -> Result<(), Box<Error>> {
         Ok(())
     }
 }
-
-//fn write_functionplot(book: &MDBook) -> Result<(), Box<Error>> {
-//    let buf: &[u8] = include_bytes!("functionplot.zip");
-//    if book.get_buildfull() || !book.get_dest().join(Path::new("functionplot")).exists() {
-//        println!("Writing functionplot static assets.");
-//        write_zip(buf, book)
-//    } else {
-//        Ok(())
-//    }
-//}
 
 fn write_nomnoml(book: &MDBook) -> Result<(), Box<Error>> {
     let buf: &[u8] = include_bytes!("nomnoml.zip");
