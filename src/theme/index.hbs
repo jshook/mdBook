@@ -25,6 +25,15 @@
         <script type="text/javascript" src="mermaid/mermaid.min.js"></script>
         <script>mermaid.initialize({startOnLoad:true,useMaxWidth:false});</script>
 
+        <!-- functionplot -->
+        <!-- <script type="text/javascript" src="functionplot/d3.v3.min.js"></script> -->
+        <!-- <script type="text/javascript" src="functionplot/math.min.js"></script> -->
+        <!-- <script type="text/javascript" src="functionplot/function-plot.js"></script> -->
+
+        <!-- jsxgraph -->
+        <script type="text/javascript" src="jsxgraph/jsxgraphcore.js"></script>
+        <link rel="stylesheet" type="text/css" href="jsxgraph/jsxgraph.css" />
+
         <!-- MathJax -->
         <script type="text/x-mathjax-config">
           MathJax.Hub.Config({
@@ -178,7 +187,6 @@
             while (elems.length>0) {
                 var elem = elems[0];
                 var noml = elem.innerHTML;
-//                var svg = "<span>Rendering...</span>\n";
 
                 try {
                     var canvas = createElement("<canvas></canvas>");
@@ -186,14 +194,6 @@
 
                     nomnoml.draw(canvas,noml);
                     elem.setAttribute("class","nomnoml-rendered");
-//                    var ast = nomnoml.parse(canvas,noml);
-//                    var directives = ast.directives;
-                    //                    svg = nomnoml.renderSvg(noml);
-//                    var node = createElement(svg);
-//                    node.setAttribute('viewbox',"0 0 250 250");
-//                    node.setAttribute('preserveAspectRatio',"xMidYMid meet");
-//                    node.setAttribute('style',"font-weight:bold; font-size:12pt; font-family:'Calibri', Helvetica, sans-serif;;stroke-width:3;stroke-linejoin:round;stroke-linecap:round");
-//                    elem.parentNode.replaceChild(node,elem);
                 } catch (err) {
                     var errdiv = createElement("<div></div>");
                     var textDiv = createElement("<pre></pre>");

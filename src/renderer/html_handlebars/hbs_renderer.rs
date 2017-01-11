@@ -79,6 +79,8 @@ impl Renderer for HtmlHandlebars {
                             content = helpers::playpen::render_playpen(&content, p);
                             content = helpers::mermaid::render_mermaid(&content);
                             content = helpers::nomnoml::render_nomnoml(&content);
+                            content = helpers::functionplot::render_functionplot(&content);
+                            content = helpers::jsxgraph::render_jsxgraph(&content);
                         }
 
                         // Render markdown using the pulldown-cmark crate
@@ -231,10 +233,32 @@ impl Renderer for HtmlHandlebars {
         write_nomnoml(book)?;
         write_mermaid(book)?;
         write_mathjax(book)?;
+//        write_functionplot(book)?;
+        write_jsxgraph(book)?;
 
         Ok(())
     }
 }
+
+fn write_jsxgraph(book: &MDBook) -> Result<(), Box<Error>> {
+    let buf: &[u8] = include_bytes!("jsxgraph.zip");
+    if book.get_buildfull() || !book.get_dest().join(Path::new("jsxgraph")).exists() {
+        println!("Writing jsxgraph static assets.");
+        write_zip(buf, book)
+    } else {
+        Ok(())
+    }
+}
+
+//fn write_functionplot(book: &MDBook) -> Result<(), Box<Error>> {
+//    let buf: &[u8] = include_bytes!("functionplot.zip");
+//    if book.get_buildfull() || !book.get_dest().join(Path::new("functionplot")).exists() {
+//        println!("Writing functionplot static assets.");
+//        write_zip(buf, book)
+//    } else {
+//        Ok(())
+//    }
+//}
 
 fn write_nomnoml(book: &MDBook) -> Result<(), Box<Error>> {
     let buf: &[u8] = include_bytes!("nomnoml.zip");
