@@ -80,6 +80,7 @@ impl Renderer for HtmlHandlebars {
                             content = helpers::mermaid::render_mermaid(&content);
                             content = helpers::nomnoml::render_nomnoml(&content);
                             content = helpers::jsxgraph::render_jsxgraph(&content);
+                            content = helpers::railroad::render_railroad(&content);
                         }
 
                         // Render markdown using the pulldown-cmark crate
@@ -233,7 +234,18 @@ impl Renderer for HtmlHandlebars {
         write_mermaid(book)?;
         write_mathjax(book)?;
         write_jsxgraph(book)?;
+        write_railroad(book)?;
 
+        Ok(())
+    }
+}
+
+fn write_railroad(book: &MDBook) -> Result<(), Box<Error>> {
+    let buf: &[u8] = include_bytes!("railroad.zip");
+    if book.get_buildfull() || !book.get_dest().join(Path::new("railroad")).exists() {
+        println!("Writing railroad static assets.");
+        write_zip(buf, book)
+    } else {
         Ok(())
     }
 }
